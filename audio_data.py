@@ -11,6 +11,7 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 import re
+import pandas as pd
 
 # 1 0 0 0 0 0 0 0 0 0    blues
 # 0 1 0 0 0 0 0 0 0 0    classical
@@ -86,7 +87,7 @@ def getFeatureSpectrogram(x, sr, genre, number):
     plt.axis('off');
     if not os.path.exists("images/" + genre):
         os.mkdir("images/" + genre)
-    plt.savefig("images/" + genre + "/" + image_name + ".png")
+    plt.savefig("images/" + genre + "/" + image_name + ".png", bbox_inches='tight', pad_inches=0)
     return features
 
 
@@ -97,6 +98,7 @@ def getFeaturesMean(x, sr):
     zero_crossing = librosa.zero_crossings(x, pad=False)
     converted_array = [int(elem) for elem in zero_crossing]  # convert T/F to 1/0
     bumped_array = [elem * 10000 for elem in converted_array]
+    #bumped zero crossing values might be misleading data
     mean_zero_crossing = np.mean(bumped_array)
     chroma_features = np.mean(librosa.feature.chroma_stft(x, sr=sr))
     features = [spectral_centroid, spectral_rolloff, spectral_bandwidth, mean_zero_crossing, chroma_features]
@@ -157,6 +159,11 @@ def getFeatures(x, sr):
     return feature_dict
 
 
+def save_to_csv(data):
+    panda_df = pd.DataFrame(data)
+    panda_df.to_csv(path_or_buf=".\audio_data_means.csv")
+
+
 def getAudioData():
     # Adapt to path
     rootdir = "genres"
@@ -175,24 +182,20 @@ def getAudioData():
                 return_array.append(audio_tuple)
     return return_array
 
+
 def getAudioDataMeans():
     # Adapt to path
     rootdir = "genres"
-    return_array = []
-    genre_list = ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"]
+    result = []
     for subdir, dirs, files in os.walk(rootdir):
-        if (len(files) > 0):
-            print(files)
-            genre = subdir.split("/", 2)[1]
-            print('(' + str(genre_list.index(genre) + 1) + '/10):', genre)
-            for i in tqdm(range(files.__len__())):
-                audio_file = os.path.join(subdir, files[i])
-                audio_data, sr = librosa.load(audio_file, mono=True, sr=None, dtype=np.float64)
-                audio_genre = getGenre(genre)
-                features = getFeaturesMean(audio_data, sr)
-                audio_tuple = (features, audio_genre)
-                return_array.append(audio_tuple)
-    return return_array
+        for i in tqdm(range(files.__len__())):
+            genre = files[i].split(".")[0]
+            audio_file = os.path.join("genres", genre, files[i])
+            audio_data, sr = librosa.load(audio_file, sr=None, dtype=np.float64)
+            features = getFeaturesMean(audio_data, sr)
+            audio_tuple = (features, genre)
+            result.append(audio_tuple)
+    return result
 
 
 def generateImages():
@@ -209,26 +212,15 @@ def generateImages():
     # Adapt to path
     for root, dirs, files in os.walk("genres"):
         for i in tqdm(range(files.__len__())):
-            genre=files[i].split(".")[0]
+            genre = files[i].split(".")[0]
 
-            audio_file = os.path.join("genres",genre, files[i])
+            audio_file = os.path.join("genres", genre, files[i])
             audio_data, sr = librosa.load(audio_file, sr=None, dtype=np.float64)
             getFeatureSpectrogram(audio_data, sr, genre, i)
     return print("Done")
 
 
-# x = getAudioData()
-# print(x)
-# start = time.time()
-# x = getAudioData()
-# end = time.time()
-# duration1 = end - start
-# start = time.time()
-# y = getAudioDataParallel()
-# end = time.time()
-# duration2 = end - start
-# print(duration1)
-# print(duration2)
 
-# generateImages()
 generateImages()
+result = getAudioDataMeans()
+save_to_csv(result)

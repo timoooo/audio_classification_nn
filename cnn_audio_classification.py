@@ -10,14 +10,7 @@ import numpy as np
 import torch.nn.functional as F
 
 
-# trainset = datasets.MNIST('', download=True, train=True, transform=transforms.ToTensor())
-#   testset = datasets.MNIST('', download=True, train=False, transform=transforms.ToTensor())
-
-# train_loader = DataLoader(trainset, batch_size=64, shuffle=True)
-# test_loader = DataLoader(testset, batch_size=64, shuffle=True)
-
-
-def get_train_and_validation_data(data_path, validation_split_ratio, seed):
+def get_train_and_validation_data_loader(data_path="images", validation_split_ratio=0.1, seed=42):
     data = torchvision.datasets.ImageFolder(
         root=data_path,
         transform=transforms.Compose([
@@ -39,13 +32,13 @@ def get_train_and_validation_data(data_path, validation_split_ratio, seed):
     train_loader = DataLoader(
         data,
         num_workers=4,
-        batch_size=30,
+        batch_size=1,
         sampler=train_sampler
     )
     valid_loader = DataLoader(
         data,
         num_workers=4,
-        batch_size=30,
+        batch_size=1,
         sampler=valid_sampler
     )
     return train_loader, valid_loader
@@ -56,11 +49,11 @@ class NeuralNet(nn.Module):
         super(NeuralNet, self).__init__()
         # convolutional layers
         self.conv1 = nn.Conv2d(3, 8, 3, padding=1)
-        self.conv2 = nn.Conv2d(8, 16, 3, padding=1)
+        self.conv2 = nn.Conv2d(8, 24, 3, padding=1)
         # linear layers
-        self.fc1 = nn.Linear(30*16*40, 256)
-        self.fc2 = nn.Linear(256, 128)
-        self.fc3 = nn.Linear(128, 64)
+        self.fc1 = nn.Linear(24 * 40 * 30, 2048)
+        self.fc2 = nn.Linear(2048, 512)
+        self.fc3 = nn.Linear(512, 64)
         self.fc4 = nn.Linear(64, 10)
         # dropout
         self.dropout = nn.Dropout(p=0.2)
@@ -74,6 +67,7 @@ class NeuralNet(nn.Module):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         # flattening the image
+        x = x.view(x.size(0), -1)
         # linear layers
         x = self.dropout(F.relu(self.fc1(x)))
         x = self.dropout(F.relu(self.fc2(x)))
@@ -83,7 +77,7 @@ class NeuralNet(nn.Module):
 
 
 if __name__ == '__main__':
-    train_loader, valid_loader = get_train_and_validation_data("images", 0.1, 33)
+    train_loader, valid_loader = get_train_and_validation_data_loader("images", 0.1, 33)
     print("Created Datasets.")
 
     model = NeuralNet()
@@ -93,14 +87,15 @@ if __name__ == '__main__':
     num_epochs = 10
     for epoch in range(num_epochs):
         loss_ = 0
+        count = 0
         for images, labels in train_loader:
-            # Flatten the input images of [28,28] to [1,784]
-            #images = images.reshape(-1, 19200)
+            count += 1
+            # images = images.reshape(-1, 19200)
+            print(count)
             # Forward Pass
             output = model(images)
             # Loss at each iteration by comparing to target(label)
             loss = lossFunction(output, labels)
-            print("Set loss")
             # Backpropogating gradient of loss
             optimizer.zero_grad()
             loss.backward()
@@ -109,7 +104,10 @@ if __name__ == '__main__':
             optimizer.step()
 
             loss_ += loss.item()
+
         print("Epoch{}, Training loss:{}".format(epoch, loss_ / len(train_loader)))
+
+    torch.save(model, 'nn_firsttry.pt')
 
     with torch.no_grad():
         correct = 0
@@ -121,5 +119,3 @@ if __name__ == '__main__':
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
         print('Testing accuracy: {} %'.format(100 * correct / total))
-
-    torch.save(model, 'mnist_model.pt')
