@@ -13,3 +13,6 @@ TO-DO
 - audio data augumentation?
 - parallelization of tasks to increase perf
 - use GPU instead of CPU
+
+
+Current Testresult: 29%
