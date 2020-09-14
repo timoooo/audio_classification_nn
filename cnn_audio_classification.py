@@ -10,6 +10,20 @@ import numpy as np
 import torch.nn.functional as F
 
 
+def testNNModel(file, valid_loader):
+    mymodel = torch.load(file)
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for images, labels in valid_loader:
+            out = mymodel(images)
+            _, predicted = torch.max(out, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+        print('Testing accuracy: {} %'.format(100 * correct / total))
+    return "done testing"
+
+
 def get_train_and_validation_data_loader(data_path="images", validation_split_ratio=0.1, seed=42):
     data = torchvision.datasets.ImageFolder(
         root=data_path,
@@ -79,7 +93,7 @@ class NeuralNet(nn.Module):
 if __name__ == '__main__':
     train_loader, valid_loader = get_train_and_validation_data_loader("images", 0.1, 33)
     print("Created Datasets.")
-
+    #testNNModel("nn_firsttry.pt", valid_loader)
     model = NeuralNet()
     lossFunction = nn.NLLLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.003, momentum=0.9)
