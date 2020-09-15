@@ -1,3 +1,5 @@
+#THIS IS A FILE TO FOOL AROUND  like an scratch file
+
 import os
 import matplotlib.pyplot as plt
 import librosa.display

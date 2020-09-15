@@ -16,6 +16,8 @@ def testNNModel(file, valid_loader):
         correct = 0
         total = 0
         for images, labels in valid_loader:
+            #images = images.view(images.size(0), -1)
+            print("do smth")
             out = mymodel(images)
             _, predicted = torch.max(out, 1)
             total += labels.size(0)
@@ -123,13 +125,4 @@ if __name__ == '__main__':
 
     torch.save(model, 'nn_firsttry.pt')
 
-    with torch.no_grad():
-        correct = 0
-        total = 0
-        for images, labels in valid_loader:
-            images = images.reshape(-1, 19200)
-            out = model(images)
-            _, predicted = torch.max(out, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
-        print('Testing accuracy: {} %'.format(100 * correct / total))
+

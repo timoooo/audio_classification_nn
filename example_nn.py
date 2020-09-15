@@ -3,7 +3,7 @@ from torchvision import transforms, datasets
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch import optim
-
+##This a pytorch hello world example used to learn
 trainset = datasets.MNIST('', download=True, train=True, transform=transforms.ToTensor())
 testset = datasets.MNIST('', download=True, train=False, transform=transforms.ToTensor())
 print()
