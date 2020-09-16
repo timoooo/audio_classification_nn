@@ -13,9 +13,11 @@ Source test data: https://www.kaggle.com/andradaolteanu/gtzan-dataset-music-genr
 - image augumentation? --> inc acc?
 - audio data augumentation? (manipulate distortion & pitches)--> inc acc?
 - image augumenation vs audio data augumentation   what is more efficient?
-
+- try torch audio to load the data
 
 #Results
 NN v1 Spectrogram Testresult: 29%   --> Does increase in features result in more accurate recognitions? increase features by a lot for v2
 
-NN v2 
+NN v2 Spectrogram Testresult: 21% --> Accuarcy slightly decreased but computation time increased a lot. --> fewer feature set more epochs to train
+
+NN v5 Spectrogram Testresult 41% --> lowering the 

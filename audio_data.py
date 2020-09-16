@@ -24,6 +24,7 @@ def getFeatureSpectrogram(x, genre, number):
     if not os.path.exists("images/" + genre):
         os.mkdir("images/" + genre)
     plt.savefig("images/" + genre + "/" + image_name + ".png", bbox_inches='tight', pad_inches=0)
+    plt.close()
     return features
 
 
@@ -153,7 +154,6 @@ def generateImages():
     for root, dirs, files in os.walk("genres"):
         for i in tqdm(range(files.__len__())):
             genre = files[i].split(".")[0]
-
             audio_file = os.path.join("genres", genre, files[i])
             audio_data, sr = librosa.load(audio_file, sr=None, dtype=np.float64)
             getFeatureSpectrogram(audio_data, genre, i)
@@ -161,5 +161,5 @@ def generateImages():
 
 
 generateImages()
-result = getAudioDataMeans()
-save_to_csv(result)
+#result = getAudioDataMeans()
+#save_to_csv(result)

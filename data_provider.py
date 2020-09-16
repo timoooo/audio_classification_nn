@@ -7,7 +7,6 @@ import torch
 
 
 def get_train_and_validation_data_loader(data_path="images", validation_split_ratio=0.1, seed=42, size=None):
-
     if size is None:
         size = [160, 120]
     data = torchvision.datasets.ImageFolder(
