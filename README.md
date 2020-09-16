@@ -20,4 +20,6 @@ NN v1 Spectrogram Testresult: 29%   --> Does increase in features result in more
 
 NN v2 Spectrogram Testresult: 21% --> Accuarcy slightly decreased but computation time increased a lot. --> fewer feature set more epochs to train
 
-NN v5 Spectrogram Testresult 41% --> lowering the 
+NN v5 Spectrogram Testresult 41% --> lowering the lr increased acc by a lot
+
+NN v6 Spectrogram Testresult 50% --> by far the best results with this setup   
