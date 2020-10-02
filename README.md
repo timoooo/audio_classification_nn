@@ -1,4 +1,4 @@
-#THIS IS *Work in progress*
+# THIS IS *Work in progress*
 
 Fooling around with pytorch and nn. 
 - GPU is automatically detected and used.
@@ -7,7 +7,7 @@ Fooling around with pytorch and nn.
 
 Source test data: https://www.kaggle.com/andradaolteanu/gtzan-dataset-music-genre-classification
 
-#TO-DO
+# TO-DO
 
 - Compare image recognition vs directly feeding the data in the nn (eg mean of features) 
 - image augumentation? --> inc acc?
